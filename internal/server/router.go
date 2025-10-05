@@ -3,6 +3,9 @@ package server
 import (
 	"errors"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -121,6 +124,21 @@ func NewRouter(cfg config.Config, repo *mysql.Repository, authRepo auth.Reposito
 		}
 		c.JSON(http.StatusOK, summary)
 	})
+
+	if cfg.StaticDir != "" {
+		if info, err := os.Stat(cfg.StaticDir); err == nil && info.IsDir() {
+			router.StaticFS("/", gin.Dir(cfg.StaticDir, true))
+
+			router.NoRoute(func(c *gin.Context) {
+				if strings.HasPrefix(c.Request.URL.Path, "/api") {
+					c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+					return
+				}
+
+				c.File(filepath.Join(cfg.StaticDir, "index.html"))
+			})
+		}
+	}
 
 	return router
 }
