@@ -14,6 +14,7 @@ type Config struct {
 	MySQLPassword  string
 	MySQLDatabase  string
 	MigrationsPath string
+	StaticDir      string
 }
 
 // Load reads configuration from environment variables and applies sensible defaults.
@@ -26,6 +27,7 @@ func Load() Config {
 		MySQLPassword:  os.Getenv("MYSQL_PASSWORD"),
 		MySQLDatabase:  getEnv("MYSQL_DATABASE", "merch"),
 		MigrationsPath: getEnv("MIGRATIONS_PATH", "db/migrations"),
+		StaticDir:      getEnv("STATIC_DIR", "web/dist"),
 	}
 
 	return cfg
