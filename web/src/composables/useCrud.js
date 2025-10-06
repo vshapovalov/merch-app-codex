@@ -24,8 +24,8 @@ export function useCrud(endpoint, createDefault, options = {}) {
     }
   };
 
-  const openCreate = () => {
-    currentItem.value = createDefault();
+  const openCreate = (initialValues = {}) => {
+    currentItem.value = { ...createDefault(), ...initialValues };
     dialogVisible.value = true;
   };
 

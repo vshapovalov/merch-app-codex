@@ -16,6 +16,7 @@ import Toast from 'primevue/toast';
 import Toolbar from 'primevue/toolbar';
 import Divider from 'primevue/divider';
 import InputNumber from 'primevue/inputnumber';
+import Tree from 'primevue/tree';
 
 import Lara from '@primevue/themes/lara';
 import 'primeicons/primeicons.css';
@@ -53,5 +54,6 @@ app.component('Toast', Toast);
 app.component('Toolbar', Toolbar);
 app.component('Divider', Divider);
 app.component('InputNumber', InputNumber);
+app.component('Tree', Tree);
 
 app.mount('#app');
