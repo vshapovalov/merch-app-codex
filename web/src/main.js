@@ -17,6 +17,7 @@ import Toolbar from 'primevue/toolbar';
 import Divider from 'primevue/divider';
 import InputNumber from 'primevue/inputnumber';
 import Tree from 'primevue/tree';
+import Drawer from 'primevue/drawer';
 
 import Lara from '@primevue/themes/lara';
 import 'primeicons/primeicons.css';
@@ -55,5 +56,6 @@ app.component('Toolbar', Toolbar);
 app.component('Divider', Divider);
 app.component('InputNumber', InputNumber);
 app.component('Tree', Tree);
+app.component('Drawer', Drawer);
 
 app.mount('#app');
