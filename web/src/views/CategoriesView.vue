@@ -2,24 +2,34 @@
   <section class="page">
     <header class="flex align-items-center justify-content-between mb-4">
       <h2 class="m-0">Категории</h2>
-      <Button label="Добавить" icon="pi pi-plus" @click="openCreate" />
+      <Button label="Добавить корневую категорию" icon="pi pi-plus" @click="openCreateRoot" />
     </header>
-    <DataTable :value="items" dataKey="id" :loading="loading" responsiveLayout="scroll">
-      <Column field="name" header="Название" sortable />
-      <Column field="parent_id" header="Родительская категория">
-        <template #body="{ data }">
-          {{ resolveCategoryName(data.parent_id) }}
-        </template>
-      </Column>
-      <Column header="Действия" style="width: 12rem">
-        <template #body="{ data }">
-          <div class="flex gap-2">
-            <Button icon="pi pi-pencil" severity="info" text rounded @click="openEdit(data)" />
-            <Button icon="pi pi-trash" severity="danger" text rounded @click="deleteItem(data)" />
+
+    <Tree
+      v-if="categoriesTree.length"
+      :value="categoriesTree"
+      :loading="loading"
+      selectionMode="single"
+      class="categories-tree"
+    >
+      <template #default="{ node }">
+        <div class="tree-node flex align-items-center justify-content-between w-full">
+          <span class="tree-node-label">{{ node.label }}</span>
+          <div class="tree-node-actions flex gap-2">
+            <Button
+              icon="pi pi-plus"
+              severity="success"
+              text
+              rounded
+              @click.stop="openCreateChild(node.data.id)"
+            />
+            <Button icon="pi pi-pencil" severity="info" text rounded @click.stop="openEdit(node.data)" />
+            <Button icon="pi pi-trash" severity="danger" text rounded @click.stop="deleteItem(node.data)" />
           </div>
-        </template>
-      </Column>
-    </DataTable>
+        </div>
+      </template>
+    </Tree>
+    <div v-else-if="!loading" class="empty-placeholder">Категории пока не добавлены</div>
 
     <Dialog v-model:visible="dialogVisible" modal :header="dialogTitle" class="w-full md:w-6">
       <form v-if="currentItem" class="flex flex-column gap-3" @submit.prevent="saveItem">
@@ -74,11 +84,24 @@ const parentOptions = computed(() => {
   return items.value.filter((category) => category.id !== currentId);
 });
 
-const resolveCategoryName = (id) => {
-  if (!id) return '';
-  const category = items.value.find((item) => item.id === id);
-  return category ? category.name : id;
+const buildTree = (categories, parentId = null) => {
+  return categories
+    .filter((category) => category.parent_id === parentId)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((category) => ({
+      key: String(category.id),
+      label: category.name,
+      data: category,
+      expanded: true,
+      children: buildTree(categories, category.id),
+    }));
 };
+
+const categoriesTree = computed(() => buildTree(items.value));
+
+const openCreateRoot = () => openCreate({ parent_id: null });
+
+const openCreateChild = (parentId) => openCreate({ parent_id: parentId });
 
 onMounted(loadItems);
 </script>
@@ -89,5 +112,26 @@ onMounted(loadItems);
   padding: 2rem;
   border-radius: 1rem;
   box-shadow: var(--card-shadow, 0 1px 4px rgba(0, 0, 0, 0.1));
+}
+
+.categories-tree {
+  border: 1px solid var(--surface-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.tree-node-label {
+  font-weight: 500;
+}
+
+.tree-node-actions .p-button {
+  width: 2rem;
+  height: 2rem;
+}
+
+.empty-placeholder {
+  text-align: center;
+  color: var(--text-color-secondary);
+  padding: 2rem 0;
 }
 </style>
