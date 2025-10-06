@@ -126,19 +126,19 @@ func NewRouter(cfg config.Config, repo *mysql.Repository, authRepo auth.Reposito
 	})
 
 	if cfg.StaticDir != "" {
-		if info, err := os.Stat(cfg.StaticDir); err == nil && info.IsDir() {
-			router.StaticFS("/", gin.Dir(cfg.StaticDir, true))
+               if info, err := os.Stat(cfg.StaticDir); err == nil && info.IsDir() {
+                       router.StaticFS("/static", gin.Dir(cfg.StaticDir, true))
 
-			router.NoRoute(func(c *gin.Context) {
-				if strings.HasPrefix(c.Request.URL.Path, "/api") {
-					c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
-					return
-				}
+                       router.NoRoute(func(c *gin.Context) {
+                               if strings.HasPrefix(c.Request.URL.Path, "/api") {
+                                       c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+                                       return
+                               }
 
-				c.File(filepath.Join(cfg.StaticDir, "index.html"))
-			})
-		}
-	}
+                               c.File(filepath.Join(cfg.StaticDir, "index.html"))
+                       })
+               }
+       }
 
 	return router
 }
