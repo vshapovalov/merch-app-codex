@@ -17,7 +17,7 @@ import Toolbar from 'primevue/toolbar';
 import Divider from 'primevue/divider';
 import InputNumber from 'primevue/inputnumber';
 
-import '@primevue/themes/lara';
+import Lara from '@primevue/themes/lara';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import './style.css';
@@ -30,7 +30,12 @@ const app = createApp(App);
 
 app.use(createPinia());
 app.use(router);
-app.use(PrimeVue, { ripple: true });
+app.use(PrimeVue, {
+  ripple: true,
+  theme: {
+    preset: Lara,
+  },
+});
 app.use(ToastService);
 
 app.component('Button', Button);
