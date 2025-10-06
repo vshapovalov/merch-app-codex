@@ -84,9 +84,11 @@ const parentOptions = computed(() => {
   return items.value.filter((category) => category.id !== currentId);
 });
 
+const getParentId = (category) => (category.parent_id ?? null);
+
 const buildTree = (categories, parentId = null) => {
   return categories
-    .filter((category) => category.parent_id === parentId)
+    .filter((category) => getParentId(category) === parentId)
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((category) => ({
       key: String(category.id),
