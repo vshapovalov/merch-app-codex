@@ -1,0 +1,7 @@
+ALTER TABLE visit_items
+    MODIFY present_quantity INT NOT NULL DEFAULT 0,
+    MODIFY store_quantity INT NOT NULL DEFAULT 0,
+    MODIFY price DECIMAL(10,2) NOT NULL DEFAULT 0;
+
+ALTER TABLE products
+    MODIFY sku VARCHAR(64) NOT NULL;
