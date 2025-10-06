@@ -7,12 +7,12 @@
     <DataTable :value="items" dataKey="id" :loading="loading" responsiveLayout="scroll">
       <Column header="Пользователь">
         <template #body="{ data }">
-          {{ findLabel(userOptions, data.user_id) }}
+          {{ userLabelById[data.user_id] ?? data.user_id ?? '' }}
         </template>
       </Column>
       <Column header="Торговая точка">
         <template #body="{ data }">
-          {{ findLabel(retailOptions, data.retail_point_id) }}
+          {{ retailLabelById[data.retail_point_id] ?? data.retail_point_id ?? '' }}
         </template>
       </Column>
       <Column field="visited_at" header="Дата посещения">
@@ -82,6 +82,14 @@ import api from '../services/api';
 const userOptions = ref([]);
 const retailOptions = ref([]);
 
+const userLabelById = computed(() =>
+  Object.fromEntries(userOptions.value.map((user) => [user.id, user.name]))
+);
+
+const retailLabelById = computed(() =>
+  Object.fromEntries(retailOptions.value.map((point) => [point.id, point.name]))
+);
+
 const crud = useCrud(
   '/visits',
   () => ({ user_id: null, retail_point_id: null, visited_at: new Date(), notes: '' }),
@@ -106,11 +114,6 @@ const formatDate = (value) => {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(date);
-};
-
-const findLabel = (options, value) => {
-  const option = options.value.find((item) => item.id === value);
-  return option ? option.name : value;
 };
 
 const openCreate = () => {

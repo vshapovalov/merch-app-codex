@@ -7,19 +7,19 @@
     <DataTable :value="items" dataKey="id" :loading="loading" responsiveLayout="scroll">
       <Column header="Визит">
         <template #body="{ data }">
-          {{ findLabel(visitOptions, data.visit_id) }}
+          {{ visitLabelById[data.visit_id] ?? data.visit_id ?? '' }}
         </template>
       </Column>
       <Column header="Продукт">
         <template #body="{ data }">
-          {{ findLabel(productOptions, data.product_id) }}
+          {{ productLabelById[data.product_id] ?? data.product_id ?? '' }}
         </template>
       </Column>
       <Column field="present_quantity" header="Кол-во на витрине" />
       <Column field="store_quantity" header="Кол-во на складе" />
       <Column field="price" header="Цена">
         <template #body="{ data }">
-          {{ Number(data.price || 0).toFixed(2) }}
+          {{ formatPrice(data.price) }}
         </template>
       </Column>
       <Column header="Действия" style="width: 12rem">
@@ -61,11 +61,11 @@
         <div class="grid form-grid">
           <div class="col-12 md:col-4">
             <label class="block mb-2">На витрине</label>
-            <InputNumber v-model="currentItem.present_quantity" :min="0" class="w-full" />
+            <InputNumber v-model="currentItem.present_quantity" class="w-full" />
           </div>
           <div class="col-12 md:col-4">
             <label class="block mb-2">На складе</label>
-            <InputNumber v-model="currentItem.store_quantity" :min="0" class="w-full" />
+            <InputNumber v-model="currentItem.store_quantity" class="w-full" />
           </div>
           <div class="col-12 md:col-4">
             <label class="block mb-2">Цена</label>
@@ -89,13 +89,35 @@ import api from '../services/api';
 const visitOptions = ref([]);
 const productOptions = ref([]);
 
-const crud = useCrud('/visit-items', () => ({
-  visit_id: null,
-  product_id: null,
-  present_quantity: 0,
-  store_quantity: 0,
-  price: 0,
-}));
+const visitLabelById = computed(() =>
+  Object.fromEntries(visitOptions.value.map((visit) => [visit.id, visit.label]))
+);
+
+const productLabelById = computed(() =>
+  Object.fromEntries(productOptions.value.map((product) => [product.id, product.name]))
+);
+
+const crud = useCrud(
+  '/visit-items',
+  () => ({
+    visit_id: null,
+    product_id: null,
+    present_quantity: null,
+    store_quantity: null,
+    price: null,
+  }),
+  {
+    preparePayload: (payload) => ({
+      ...payload,
+      present_quantity: payload.present_quantity ?? null,
+      store_quantity: payload.store_quantity ?? null,
+      price:
+        payload.price === null || payload.price === undefined || payload.price === ''
+          ? null
+          : Number(payload.price),
+    }),
+  }
+);
 
 const { items, loading, saving, dialogVisible, currentItem, loadItems, deleteItem } = crud;
 
@@ -113,9 +135,11 @@ const openEdit = (item) => {
 
 const saveItem = () => crud.saveItem();
 
-const findLabel = (options, value) => {
-  const option = options.value.find((item) => item.id === value);
-  return option ? option.label || option.name : value;
+const formatPrice = (value) => {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+  return Number(value).toFixed(2);
 };
 
 const loadOptions = async () => {

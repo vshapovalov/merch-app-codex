@@ -34,7 +34,7 @@
           <label for="name">Название</label>
         </span>
         <span class="p-float-label">
-          <InputText id="sku" v-model="currentItem.sku" required />
+          <InputText id="sku" v-model="currentItem.sku" />
           <label for="sku">SKU</label>
         </span>
         <div>
@@ -78,6 +78,25 @@ import api from '../services/api';
 const brandOptions = ref([]);
 const categoryOptions = ref([]);
 
+const normalizeSku = (value) => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  const trimmed = String(value).trim();
+  return trimmed === '' ? null : trimmed;
+};
+
+const crud = useCrud(
+  '/products',
+  () => ({ name: '', sku: '', brand_id: null, category_id: null }),
+  {
+    preparePayload: (payload) => ({
+      ...payload,
+      sku: normalizeSku(payload.sku),
+    }),
+  }
+);
+
 const {
   items,
   loading,
@@ -89,7 +108,7 @@ const {
   openEdit,
   saveItem,
   deleteItem,
-} = useCrud('/products', () => ({ name: '', sku: '', brand_id: null, category_id: null }));
+} = crud;
 
 const dialogTitle = computed(() =>
   currentItem?.value?.id ? 'Редактирование продукта' : 'Новый продукт'

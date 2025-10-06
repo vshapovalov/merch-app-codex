@@ -61,10 +61,10 @@ type Category struct {
 
 type Product struct {
 	BaseModel
-	Name       string `json:"name" gorm:"size:255;not null"`
-	SKU        string `json:"sku" gorm:"size:64;uniqueIndex;not null"`
-	BrandID    string `json:"brand_id" gorm:"type:char(26);not null"`
-	CategoryID string `json:"category_id" gorm:"type:char(26);not null"`
+	Name       string  `json:"name" gorm:"size:255;not null"`
+	SKU        *string `json:"sku" gorm:"size:64;uniqueIndex"`
+	BrandID    string  `json:"brand_id" gorm:"type:char(26);not null"`
+	CategoryID string  `json:"category_id" gorm:"type:char(26);not null"`
 }
 
 type Visit struct {
@@ -77,11 +77,11 @@ type Visit struct {
 
 type VisitItem struct {
 	BaseModel
-	VisitID         string  `json:"visit_id" gorm:"type:char(26);not null"`
-	ProductID       string  `json:"product_id" gorm:"type:char(26);not null"`
-	PresentQuantity int     `json:"present_quantity"`
-	StoreQuantity   int     `json:"store_quantity"`
-	Price           float64 `json:"price"`
+	VisitID         string   `json:"visit_id" gorm:"type:char(26);not null"`
+	ProductID       string   `json:"product_id" gorm:"type:char(26);not null"`
+	PresentQuantity *int     `json:"present_quantity"`
+	StoreQuantity   *int     `json:"store_quantity"`
+	Price           *float64 `json:"price"`
 }
 
 type UserToken struct {
